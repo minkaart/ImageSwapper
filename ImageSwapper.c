@@ -3,6 +3,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
+#include<math.h>
 
 struct Range
 	{
@@ -40,7 +41,13 @@ int main()
 	long high; //low and high representing the entire file-size 
 	long low_range;
 	long high_range; //low and high representing ranges on each swap loop
-	long range_array [swaps][2]; //array holding all previous swapped bit ranges
+	//long range_array [swaps][2]; //array holding all previous swapped bit ranges
+	int range_array_length = 2*swaps+2;
+	long range_array [range_array_length];
+	for(int i=0; i<range_array_length; i++){
+		range_array[i] = 0; 
+	}
+	printf("%lu\n", sizeof(range_array));
 	struct Range single_range; 
 
 //read two images into buffer 
@@ -66,14 +73,65 @@ int main()
 //SET LOW/HIGH BASED ON ACTUAL FILE SIZES
 	if(file_size_1>file_size_2){
 		high = file_size_2;
-		low = .05 * file_size_2;
+		low = .005 * file_size_2;
 	} else {
 		high = file_size_1;
-		low = .05 * file_size_1;
+		low = .005 * file_size_1;
 	}
 
 //LOOP CREATES RANGES, POPULATES RANGE ARRAY, 
-	low_range = random_number(low, high);
+	range_array[0] = low; 
+	range_array[1] = high;
+
+	int count = 0; //number of runs of do loop, which 
+	int length; //length of the array each time do: loop is called (function of counts)
+	int skips; //divisions skipped as a result of small intervals
+	do{
+		printf("length:%d\n", length );
+		for (int i =0; 2*i+1<length; i++){
+			int target = 2*i+1; //position in the array currently being calculated
+			int this_skips = 0; //holds number of skips in this iteration
+			if(target<=swaps*2){
+				printf("target (%d) is less than swaps (%d) (*2) \n", target, swaps );
+				if(range_array[target] - range_array[target-1] > 5){
+					printf("range_array[%d](%lu) - range_array[%d](%lu) = %lu\n", target, range_array[target], target-1, range_array[target-1], range_array[target]-range_array[target-1]);
+					long new_val = random_number(range_array[target-1], range_array[target]);
+					/*Shift array to place new value in appropriate location
+					length+i = total length of the array before shift, but 
+					accounting for the number of shifts that have already occured*/
+					for(int j = length+i - this_skips; j>=target; j--){
+						range_array[j+1] = range_array[j];
+						printf("shift: %d\n", j);
+					}
+					range_array[target] = new_val; 
+					printf("target: %d new value: %lu\n", target, new_val);
+				} else {
+					printf("SKIP:\n  range_array[%d](%lu) - range_array[%d](%lu) = %lu\n", target, range_array[target], target-1, range_array[target-1], range_array[target]-range_array[target-1]);
+					skips++; 
+					this_skips++;
+				}
+			} else {
+				printf("target (%d) is greater than swaps (%d) *2 \n", target, swaps);
+			}
+			
+		}
+		//output array values (error checking)
+		for(int i=0; i<range_array_length; i++){
+			if(range_array[i] != 0){
+				printf("A %d: %lu\n", i, range_array[i]);	
+			}
+		}
+		count++; 
+		length = exp2(count) - skips;
+		printf("Exponent Count (length w/out skips) %f\n Actual Length: %d\n Skips: %d\n", exp2(count), length, skips);
+	}while (exp2(count-1)<swaps*2+2);
+	printf("Exited with length (%d)>swaps*2+2(%d)\n", length, swaps*2+2);
+
+	/*for(int i=0; i<range_array_length; i++){
+		printf("B %d: %lu\n", i, range_array[i]);
+	}*/
+
+	/*low_range = random_number(low, high);
 	high_range = random_number(low_range, high);
 	range_array[0][0] = low_range;
 	range_array[0][1] = high_range; 
@@ -104,9 +162,9 @@ int main()
 		for(int x = 0; x<=i; x++){
 			printf("  %d low, %lu : high, %lu\n", x, range_array[x][0], range_array[x][1]);	
 		}
-	}
+	}*/
 
-//AND SWAPS VALUES
+/*//AND SWAPS VALUES
 	char filename[10];
 	for (int i = 0; i<swaps; i++){
 		printf("  %d low, %lu : high, %lu\n", i, range_array[i][0], range_array[i][1]);
@@ -119,7 +177,7 @@ int main()
 		fwrite(img_buff, 1, max_file_size, img3);
 		fclose(img3);
 	}
-		
+*/		
 
 }
 
