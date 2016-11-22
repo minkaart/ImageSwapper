@@ -22,7 +22,7 @@ int main()
 //GLOBALS
 //Runtime changeable variables max file size and number of exchanges
 	long max_file_size = 1000000;
-	int swaps = 25;
+	int swaps = 20;
 
 //3 image files 1: first image 2: second image 3: image to write new image to
 	FILE *img; 
@@ -60,6 +60,7 @@ int main()
 
 //!!img3 = fopen("combined.jpg", "wb"); //make this variable!! change every new image creation loop! 
 	srand(time(0));
+	printf("time: %ld\n", time(0));
 
 //GET ACTUAL FILE SIZE OF IMAGES ONE AND TWO 
 	file_size_1 = file_size(img_buff, max_file_size);
@@ -75,10 +76,10 @@ int main()
 //SET LOW/HIGH BASED ON ACTUAL FILE SIZES
 	if(file_size_1>file_size_2){
 		high = file_size_2;
-		low = .04 * file_size_2;
+		low = .05 * file_size_2;
 	} else {
 		high = file_size_1;
-		low = .04 * file_size_1;
+		low = .05 * file_size_1;
 	}
 
 //LOOP CREATES RANGES, POPULATES RANGE ARRAY, 
@@ -133,7 +134,8 @@ int main()
 	printf("Exited with length (%d)>swaps*2+2(%d)\n", length, swaps*2+2);
 	printf("Size of Range_array%lu\n", sizeof(range_array) );
 
-	char file_name[10];
+	char file_name[21];
+	long time_ = time(0);
 	for(int i=1; i<range_array_length-1; i +=2){
 		low_range = range_array[i];
 		high_range = range_array[i+1];
@@ -142,7 +144,7 @@ int main()
 			img_buff[j] = img2_buff[j];
 		}
 
-		sprintf(file_name, "new%d.jpg", i);
+		sprintf(file_name, "%ldnew%d.jpg", time_, i);
 		img3 = fopen(file_name, "wb");
 		fwrite(img_buff, 1, max_file_size, img3);
 		fclose(img3);
