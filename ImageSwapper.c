@@ -22,7 +22,7 @@ int main()
 //GLOBALS
 //Runtime changeable variables max file size and number of exchanges
 	long max_file_size = 1000000;
-	int swaps = 10;
+	int swaps = 25;
 
 //3 image files 1: first image 2: second image 3: image to write new image to
 	FILE *img; 
@@ -75,10 +75,10 @@ int main()
 //SET LOW/HIGH BASED ON ACTUAL FILE SIZES
 	if(file_size_1>file_size_2){
 		high = file_size_2;
-		low = .05 * file_size_2;
+		low = .04 * file_size_2;
 	} else {
 		high = file_size_1;
-		low = .05 * file_size_1;
+		low = .04 * file_size_1;
 	}
 
 //LOOP CREATES RANGES, POPULATES RANGE ARRAY, 
@@ -95,7 +95,7 @@ int main()
 			int this_skips = 0; //holds number of skips in this iteration
 			if(target<=swaps*2){
 				printf("target (%d) is less than swaps (%d) (*2) \n", target, swaps );
-				if(range_array[target] - range_array[target-1] > 5){
+				if(range_array[target] - range_array[target-1] > 1000){
 					printf("range_array[%d](%lu) - range_array[%d](%lu) = %lu\n", target, range_array[target], target-1, range_array[target-1], range_array[target]-range_array[target-1]);
 					long new_val = random_number(range_array[target-1], range_array[target]);
 					/*Shift array to place new value in appropriate location
@@ -137,6 +137,7 @@ int main()
 	for(int i=1; i<range_array_length-1; i +=2){
 		low_range = range_array[i];
 		high_range = range_array[i+1];
+		
 		for(int j = range_array[i]; j<range_array[i+1]; j++){
 			img_buff[j] = img2_buff[j];
 		}
